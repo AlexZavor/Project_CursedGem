@@ -3,7 +3,7 @@ include Curses
 
 init_screen
 start_color
-curs_set(1) # Invisible Cursor
+curs_set(1) # visible Cursor
 
 #	hello world with curses
 #begin
@@ -28,7 +28,7 @@ begin
   win1.refresh
 
   # Text writer
-  win2 = Curses::Window.new(Curses.lines / 2 - 1, Curses.cols, 
+  win2 = Curses::Window.new(Curses.lines / 2 - 1, Curses.cols,
                             Curses.lines / 2, 0)
   init_pair(1, COLOR_GREEN, COLOR_BLACK)
   win2.box("|", "-")
