@@ -25,10 +25,46 @@ class Character
     end
   end
 end
+class World
+  def initialize(win)
+    @win = win
+    @wMap = []
+   (@win.maxx()-2).times do
+      x=[]
+      (@win.maxy()-2).times do
+        x.push(".")
+      end
+      @wMap.push(x)
+    end
+  end
+  def draw()
+    x=1
+    @wMap.each do |col|
+      y=1
+      col.each do |char|
+        @win.setpos(y,x)
+        @win.addch(char)
+        y+=1
+      end
+      x+=1
+    end
+    @win.attroff(color_pair(1))
+    @win.box("%", "-")
+    @win.attron(color_pair(1))
+  end
+end
+def closewin(win)
+  sleep 0.1
+  win.clear
+  win.refresh
+  win.close
+end
+
 
 init_screen
 start_color
 curs_set(0) # invisible Cursor
+noecho() #turn off autotype
 
 begin
   # Building a static for UI
@@ -42,13 +78,16 @@ begin
   game = Curses::Window.new(lines-5, cols,
                             0, 0)
   player = Character.new(4,4,game)
+  world = World.new(game)
 
   game.keypad(true)
-  noecho()
   init_pair(1, COLOR_GREEN, COLOR_BLACK)
+
+  #start drawing!
   game.box("*", "*")
   game.attrset(color_pair(1))
-  player.draw()
+  game.setpos(game.maxy()/2,game.maxx()/2-10)
+  game.addstr("Press Enter to Start")
   while true
   input = game.get_char()
     if input == KEY_DC then #exit with delete
@@ -61,27 +100,16 @@ begin
       player.movex(-1)
     elsif input == KEY_RIGHT then
       player.movex(1)
-    elsif input != nil
-      #wintext.insch(input)
     end
-    game.clear
-    game.attroff(color_pair(1))
-    game.box("*", "*")
-    game.attron(color_pair(1))
+    game.clear  #refresh screen
+    world.draw()
     player.draw()
     game.refresh
   end
 
   # Clearing windows each in turn
-  sleep 0.2
-  win1.clear
-  win1.refresh
-  win1.close
-  sleep 0.2
-  game.clear
-  game.refresh
-  game.close
-  sleep 0.2
+  closewin(win1)
+  closewin(game)
 rescue => ex
   Curses.close_screen
 end
